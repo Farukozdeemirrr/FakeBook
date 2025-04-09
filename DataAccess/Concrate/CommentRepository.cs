@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DataAccess.Abstract;
+using Entities;
 
 namespace DataAccess.Concrate
 {
-    public class CommentRepository
+    public class CommentRepository: BaseRepository<Comment>, ICommentRepository
     {
     }
 }

@@ -1,4 +1,4 @@
-﻿using DataAccess.Abstract;
+﻿using DTO.User;
 using Entities;
 using System;
 using System.Collections.Generic;
@@ -6,9 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccess.Concrate
+namespace Business.Security.Abstarct
 {
-    public class UserRepository : BaseRepository<User>, IUserRepository
+    public interface ITokenService
     {
+        string GenerateToken(User user);
     }
+
 }

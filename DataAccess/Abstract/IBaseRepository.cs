@@ -14,5 +14,7 @@ namespace DataAccess.Abstract
         T Update(FakeBookDbContext context, T entity);
         void Delete(FakeBookDbContext context, long id);
         T GetById(FakeBookDbContext context, long id);
+
+        T GetByEmail(FakeBookDbContext context, string Email);
     }
 }
