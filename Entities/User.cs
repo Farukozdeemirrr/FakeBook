@@ -16,9 +16,16 @@ namespace Entities
         public string? ProfilePicture { get; set; }
         public string? Bio { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public UserRole userRole { get; set; }  
 
         public ICollection<Post> Posts { get; set; }
         public ICollection<Comment> Comments { get; set; }
+    }
+
+    public enum UserRole
+    {
+        User = 0,
+        Admin = 1
     }
 
 }
