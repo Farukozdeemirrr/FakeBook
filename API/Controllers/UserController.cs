@@ -37,6 +37,14 @@ namespace API.Controllers
             var getAllUser = _userService.GetAllUser();
             return Ok(getAllUser);
         }
+
+        [Authorize]
+        [HttpDelete]
+        public IActionResult DeleteUser(long id)
+        {
+            var deleteUser = _userService.UserDelete(id);
+            return Ok(deleteUser);
+        }
         
     }
 }

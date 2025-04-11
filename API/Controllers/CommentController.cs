@@ -37,6 +37,7 @@ namespace API.Controllers
         [FromBody] CommentCreateDto commentCreateDto)
         {
             // ✅ Token içinden userId'yi çekiyoruz
+            //BURASI NASIL OLUYOR DETAYLI BİR ŞEKİLDE SOR VEYA FARKLI BİR YOLU VAR MI??? 
             var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
             var commentCreate = _commentService.CreateCommet(userId, postId, commentCreateDto);
@@ -59,6 +60,15 @@ namespace API.Controllers
             var getAllComment = _commentService.GetAllComment();
             return Ok(getAllComment);
         }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public IActionResult DeleteComment([FromRoute] long id)
+        {
+            _commentService.DeleteComment(id);
+            return NoContent(); // 204 No Content
+        }
+
 
     }
 }

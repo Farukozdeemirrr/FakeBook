@@ -41,6 +41,21 @@ namespace Business.Concrate
                 return _mapper.Map<UserDto>(user);
             }
         }
+        public UserDto UserDelete(long id)
+        {
+            using (var context = new FakeBookDbContext())
+            {
+                var user = _userRepository.GetById(context, id);
+                if (user == null)
+                    throw new Exception("Kullanıcı bulunamadı");
+
+                _userRepository.Delete(context, id); // ✅ Sadece id ile sil
+                context.SaveChanges();
+
+                return _mapper.Map<UserDto>(user); // ✅ Silinen bilgiyi döndür
+            }
+        }
+
 
         public UserDto UserUpdate(long id, UserUpdateDto userUpdate)
         {

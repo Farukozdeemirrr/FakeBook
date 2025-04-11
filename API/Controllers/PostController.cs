@@ -27,5 +27,28 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        [HttpPut]
+        [Authorize]
+        public IActionResult UpdatePost([FromBody] PostCreateDto updateDto, long id)
+        {
+            var updatePost = _postservice.UpdatePost(id, updateDto);
+            return Ok(updatePost);
+        }
+
+        [HttpDelete ("{id}")]
+        [Authorize]
+        public IActionResult DeletePost([FromRoute] long id)
+        {
+            _postservice.DeletePost(id);
+            return Ok();
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult GetPost([FromRoute] long id) {
+            var getPost = _postservice.GetByPostId(id);
+            return Ok(getPost);
+        }
+
     }
 }
