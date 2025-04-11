@@ -36,12 +36,18 @@ namespace Business.Concrate
             using (var context = new FakeBookDbContext())
             {
                 var entityComment = _mapper.Map<Comment>(commentCreateDto);
+                entityComment.UserId = userId;
+                entityComment.PostId = postId;
+                entityComment.CreatedAt = DateTime.UtcNow;
+
                 var createComment = _commentRepository.Add(context, entityComment);
                 context.SaveChanges();
 
                 return _mapper.Map<CommentCreateDto>(createComment);
             }
         }
+
+
 
         public void DeleteComment(long id)
         {
@@ -52,7 +58,7 @@ namespace Business.Concrate
             }
         }
 
-        public List<CommentDto> GetAllComment(long id)
+        public List<CommentDto> GetAllComment()
         {
             using (var context = new FakeBookDbContext())
             {
@@ -62,6 +68,18 @@ namespace Business.Concrate
             }
         }
 
+        public CommentCreateDto UpdateComment(CommentCreateDto commentUpdateDto)
+        {
 
+            using (var context = new FakeBookDbContext())
+            {
+                var entityComment = _mapper.Map<Comment>(commentUpdateDto);
+                var updateComment = _commentRepository.Add(context, entityComment);
+                context.SaveChanges();
+
+                return _mapper.Map<CommentCreateDto>(updateComment);
+            }
+            
+        }
     }
 }

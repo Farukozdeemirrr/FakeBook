@@ -31,10 +31,13 @@ namespace Business.MappinProfile
 
             // Comment
             CreateMap<CommentCreateDto, Comment>();
+            CreateMap<Comment, CommentCreateDto>(); // ⛔ Eksik
+
 
             CreateMap<Comment, CommentDto>()
                 .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"))
                 .ForMember(dest => dest.UserProfilePicture, opt => opt.MapFrom(src => src.User.ProfilePicture));
+
         }
     }
 }

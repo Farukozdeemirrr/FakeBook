@@ -22,17 +22,37 @@ namespace Business.Concrate
             _postRepository = repository;
         }
 
+        //public PostDto CreatePost(long userId, PostCreateDto createDto)
+        //{
+        //    var entityPost = _mapper.Map<Post>(createDto);
+        //    using (var context = new FakeBookDbContext())
+        //    {
+        //        var createPost = _postRepository.Add(context, entityPost);
+        //        context.SaveChanges();
+        //        return _mapper.Map<PostDto>(createPost);
+
+        //    }
+        //}
         public PostDto CreatePost(long userId, PostCreateDto createDto)
         {
-            var entityPost = _mapper.Map<Post>(createDto);
             using (var context = new FakeBookDbContext())
             {
+                var user = context.Users.FirstOrDefault(x => x.Id == userId);
+                if (user == null)
+                    throw new Exception("Token'daki kullanıcı bulunamadı.");
+
+                var entityPost = _mapper.Map<Post>(createDto);
+                entityPost.UserId = userId;
+                entityPost.CreatedAt = DateTime.UtcNow;
+
                 var createPost = _postRepository.Add(context, entityPost);
                 context.SaveChanges();
-                return _mapper.Map<PostDto>(createPost);
 
+                return _mapper.Map<PostDto>(createPost);
             }
         }
+
+
 
         public void DeletePost(long id)
         {

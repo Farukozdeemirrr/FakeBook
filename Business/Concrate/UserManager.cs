@@ -57,6 +57,8 @@ namespace Business.Concrate
                 user.ProfilePicture = userUpdate.ProfilePicture ?? user.ProfilePicture;
 
                 _userRepository.Update(context, user);
+                context.SaveChanges();
+
                 return _mapper.Map<UserDto>(user);
             }
         }

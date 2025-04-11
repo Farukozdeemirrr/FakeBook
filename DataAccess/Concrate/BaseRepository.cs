@@ -1,5 +1,6 @@
 ﻿using Business;
 using DataAccess.Abstract;
+using Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,9 @@ namespace DataAccess.Concrate
         {
             return context.Set<T>();
         }
+
+        
+
 
         public T GetById(FakeBookDbContext context, long id)
         {

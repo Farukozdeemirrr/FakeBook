@@ -73,6 +73,7 @@ namespace Business.Concrate
 
                 // Kaydet
                 _userRepository.Add(context, user);
+                context.SaveChanges(); // Veritabanına işle
 
                 // Token oluştur
                 var token = _tokenService.GenerateToken(user);
@@ -92,8 +93,11 @@ namespace Business.Concrate
         {
             using (var context = new FakeBookDbContext())
             {
-                var user = _userRepository.GetByEmail(context, userLoginDto.Email);
-        if (user == null)
+                var user = _userRepository
+                    .GetAll(context)
+                    .FirstOrDefault(x => x.Email == userLoginDto.Email);
+
+                if (user == null)
             throw new Exception("Kullanıcı bulunamadı.");
 
         // 2. Şifre doğrulama

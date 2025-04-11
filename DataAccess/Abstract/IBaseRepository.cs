@@ -1,4 +1,5 @@
 ﻿using Business;
+using Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,5 @@ namespace DataAccess.Abstract
         void Delete(FakeBookDbContext context, long id);
         T GetById(FakeBookDbContext context, long id);
 
-        T GetByEmail(FakeBookDbContext context, string Email);
     }
 }
