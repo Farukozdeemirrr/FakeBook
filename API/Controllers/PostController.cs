@@ -1,4 +1,4 @@
-﻿using Business.Abstract;
+using Business.Abstract;
 using DTO.Post;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,20 +18,19 @@ namespace API.Controllers
             _postservice = postservice;
         }
 
-        [HttpPost]
         [Authorize]
+        [HttpPost]
         public IActionResult CreatePost([FromBody] PostCreateDto createDto)
         {
-            var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var result = _postservice.CreatePost(userId, createDto);
+            var result = _postservice.CreatePost(createDto);
             return Ok(result);
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize]
-        public IActionResult UpdatePost([FromBody] PostCreateDto updateDto, long id)
+        public IActionResult UpdatePost([FromBody] PostUpdateDto updateDto, long id)
         {
-            var updatePost = _postservice.UpdatePost(id, updateDto);
+            var updatePost = _postservice.UpdatePost(updateDto);
             return Ok(updatePost);
         }
 
@@ -43,11 +42,19 @@ namespace API.Controllers
             return Ok();
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         [Authorize]
         public IActionResult GetPost([FromRoute] long id) {
-            var getPost = _postservice.GetByPostId(id);
-            return Ok(getPost);
+            var getPostById = _postservice.GetByPostId(id);
+            return Ok(getPostById);
+        }
+
+        [HttpGet()]
+        [Authorize]
+        public IActionResult GetAllPost()
+        {
+            var getAllPost = _postservice.GetAllPosts();
+            return Ok(getAllPost);
         }
 
     }

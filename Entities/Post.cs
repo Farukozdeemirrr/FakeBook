@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Entities
 {
-    public class Post
+    public class Post : BaseEntity
     {
-        public long Id { get; set; }
         public long UserId { get; set; }
         public string Content { get; set; } = null!;
         public string? ImageUrl { get; set; }

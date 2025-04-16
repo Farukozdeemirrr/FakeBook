@@ -1,8 +1,10 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Business.Abstract;
+using Business.Security.Abstarct;
 using DataAccess.Abstract;
 using DTO.Post;
 using Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +17,13 @@ namespace Business.Concrate
     {
         private IMapper _mapper;
         private IPostRepository _postRepository;
+        private IUserClaim _userClaim;
 
-        public PostManager(IMapper mapper, IPostRepository repository) 
+        public PostManager(IMapper mapper, IPostRepository repository, IUserClaim userClaim)
         {
             _mapper = mapper;
             _postRepository = repository;
+            _userClaim = userClaim;
         }
 
         //public PostDto CreatePost(long userId, PostCreateDto createDto)
@@ -33,26 +37,30 @@ namespace Business.Concrate
 
         //    }
         //}
-        public PostDto CreatePost(long userId, PostCreateDto createDto)
+        public PostDto CreatePost(PostCreateDto createDto)
         {
             using (var context = new FakeBookDbContext())
             {
-                var user = context.Users.FirstOrDefault(x => x.Id == userId);
-                if (user == null)
-                    throw new Exception("Token'daki kullanıcı bulunamadı.");
-
+                // 1. DTO'dan Entity'ye dönüşüm
                 var entityPost = _mapper.Map<Post>(createDto);
-                entityPost.UserId = userId;
+
+                // 2. Token'dan gelen UserId'yi ata
+                entityPost.UserId = _userClaim.UserId;
                 entityPost.CreatedAt = DateTime.UtcNow;
 
-                var createPost = _postRepository.Add(context, entityPost);
+                // 3. Post'u veritabanına kaydet
+                var createdPost = _postRepository.Add(context, entityPost);
                 context.SaveChanges();
 
-                return _mapper.Map<PostDto>(createPost);
+                // 4. User bilgilerini manuel olarak çek → çünkü AutoMapper User.FullName için bu veriye ihtiyaç duyar
+                var postWithUser = context.Posts
+                    .Include(p => p.User)
+                    .FirstOrDefault(p => p.Id == createdPost.Id);
+
+                // 5. DTO'ya map et ve dön
+                return _mapper.Map<PostDto>(postWithUser);
             }
         }
-
-
 
         public void DeletePost(long id)
         {
@@ -97,15 +105,34 @@ namespace Business.Concrate
         }
 
 
-        public PostDto UpdatePost(long id, PostCreateDto updateDto)
+        public PostDto UpdatePost(PostUpdateDto updateDto)
         {
-            var entityPost = _mapper.Map<Post>(updateDto);
             using (var context = new FakeBookDbContext())
             {
-                var updatePost = _postRepository.Add(context, entityPost);
+                // 1. İlgili postu kullanıcı bilgisiyle birlikte çekiyoruz
+                var post = context.Posts
+                    .Include(p => p.User)
+                    .FirstOrDefault(p => p.Id == updateDto.Id);
+
+                if (post == null)
+                    throw new Exception("Post bulunamadı.");
+
+                // 2. Sadece sahip olan kullanıcı ya da admin güncelleyebilir
+                if (post.UserId != _userClaim.UserId && _userClaim.Role != "Admin")
+                    throw new UnauthorizedAccessException("Bu gönderiyi güncelleme yetkiniz yok.");
+
+                // 3. Güncelleme işlemi (null olmayan alanlar DTO'dan alınır)
+                _mapper.Map(updateDto, post);
+
+                // 4. Veritabanına işle
                 context.SaveChanges();
-                return _mapper.Map<PostDto>(updatePost);
+
+                // 5. Cevap DTO’su olarak PostDto dön (User bilgisi de maplenecek şekilde)
+                return _mapper.Map<PostDto>(post);
             }
         }
+
+
+
     }
 }

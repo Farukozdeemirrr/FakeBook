@@ -1,4 +1,4 @@
-﻿using DTO.Post;
+using DTO.Post;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +12,8 @@ namespace Business.Abstract
         List<PostDto> GetAllPosts();
         List<PostDto> GetByUserId(long userId);
         PostDto GetByPostId(long id);
-        PostDto CreatePost(long userId, PostCreateDto createDto);
-        PostDto UpdatePost(long id, PostCreateDto updateDto);
+        PostDto CreatePost(PostCreateDto createDto);
+        PostDto UpdatePost(PostUpdateDto updateDto);
         void DeletePost(long id);
     }
 }
