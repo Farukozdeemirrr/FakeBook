@@ -74,7 +74,7 @@ namespace API
             builder.Services.AddScoped<IUserClaim, UserClaim>();
             builder.Services.AddScoped<UserIdResolver>(); // Bunu unutma
 
-            builder.Services.AddAutoMapper(typeof(MappingProfile)); //Mapleme iþlemi gerçekleþtiriliyor.
+            builder.Services.AddAutoMapper(typeof(MappingProfile)); //Mapleme iÅŸlemi gerÃ§ekleÅŸtiriliyor.
 
 
             builder.Services.AddValidatorsFromAssemblyContaining<UserLoginDtoValidator>();
