@@ -22,7 +22,7 @@ namespace API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            
+
 
             // appsettings.json + environment vs. otomatik okunur
             var configuration = builder.Configuration;
@@ -33,37 +33,34 @@ namespace API
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-           
+
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-                    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
 
-                    ValidIssuer = configuration["Jwt:Issuer"],
-                    ValidAudience = configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
-                };
-            });
-
-
-            // Program.cs veya Startup.cs içinde
+            ValidIssuer = configuration["Jwt:Issuer"],
+            ValidAudience = configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
+        };
+    });
 
 
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
             builder.Services.AddScoped<ITokenService, TokenManager>();
             builder.Services.AddScoped<IAuthService, AuthManager>();
-            
+
             builder.Services.AddScoped<ICommentService, CommentManager>();
             builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
@@ -73,12 +70,14 @@ namespace API
             builder.Services.AddScoped<IUserService, UserManager>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddScoped<IUserClaim, UserClaim>();
+            builder.Services.AddScoped<UserIdResolver>(); // Bunu unutma
+
             builder.Services.AddAutoMapper(typeof(MappingProfile)); //Mapleme iþlemi gerçekleþtiriliyor.
 
-            //FLUENT VALÝDATÝON
-            // Program.cs içine þunlarý ekle:
-          
-            builder.Services.AddValidatorsFromAssemblyContaining<UserLoginDtoValidator>(); // OtelValidator otomatik bulunur
+
+            builder.Services.AddValidatorsFromAssemblyContaining<UserLoginDtoValidator>();
             builder.Services.AddFluentValidationAutoValidation();
 
             var app = builder.Build();

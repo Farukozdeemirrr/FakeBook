@@ -1,4 +1,6 @@
 ﻿using Business.Abstract;
+using Business.Security.Abstarct;
+using Business.Security.Concrate;
 using DataAccess.Abstract;
 using DTO.Comment;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +19,7 @@ namespace API.Controllers
         public CommentController(ICommentService commentService)
         {
             _commentService = commentService;
+            
         }
 
         //[Authorize]
@@ -31,30 +34,24 @@ namespace API.Controllers
         //}
 
         [Authorize]
-        [HttpPost]
-        public IActionResult CreateCooment(
-        [FromQuery] long postId,
-        [FromBody] CommentCreateDto commentCreateDto)
-        {
-            // ✅ Token içinden userId'yi çekiyoruz
-            //BURASI NASIL OLUYOR DETAYLI BİR ŞEKİLDE SOR VEYA FARKLI BİR YOLU VAR MI??? 
-            var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-            var commentCreate = _commentService.CreateCommet(userId, postId, commentCreateDto);
+        [HttpPost()]
+        public IActionResult CreateComment([FromBody] CommentCreateDto commentCreateDto)
+        { 
+            var commentCreate = _commentService.CreateComment(commentCreateDto);
             return Ok(commentCreate);
         }
 
 
         [Authorize]
-        [HttpPut("Put")]
-        public IActionResult UpdateComment([FromBody] CommentCreateDto commentUpdateDto)
+        [HttpPut("{id}")]
+        public IActionResult UpdateComment([FromBody] CommentUpdateDto commentUpdateDto, long id)
         {
-            var updateComment = _commentService.UpdateComment(commentUpdateDto);
-            return Ok(updateComment);
+            var result = _commentService.UpdateComment(commentUpdateDto);
+            return Ok(result);
         }
 
         [Authorize]
-        [HttpGet]
+        [HttpGet()]
         public IActionResult GetAllComment()
         {
             var getAllComment = _commentService.GetAllComment();
@@ -63,12 +60,11 @@ namespace API.Controllers
 
         [Authorize]
         [HttpDelete("{id}")]
-        public IActionResult DeleteComment([FromRoute] long id)
+        public IActionResult DeleteComment(long id)
         {
             _commentService.DeleteComment(id);
-            return NoContent(); // 204 No Content
+            return Ok("Yorum silindi.");
         }
-
 
     }
 }

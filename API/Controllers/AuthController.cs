@@ -15,15 +15,13 @@ namespace API.Controllers
     {
 
         private IAuthService _authService;
-        private readonly ITokenService _tokenService;
 
-        public AuthController(ITokenService tokenService, IAuthService authService)
-        {
-            _tokenService = tokenService;
+        public AuthController(IAuthService authService)
+        {  
             _authService = authService;
         }
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public IActionResult Login([FromBody] UserLoginDto userLoginDto)
         {
          var result = _authService.Login(userLoginDto);

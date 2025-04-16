@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Entities
 {
-    public class Comment
+    public class Comment : BaseEntity
     {
-        public long Id { get; set; }
         public long PostId { get; set; }
         public long UserId { get; set; }
         public string Text { get; set; } = null!;

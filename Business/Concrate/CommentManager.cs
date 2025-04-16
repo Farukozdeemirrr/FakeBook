@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Abstract;
+using Business.Security.Abstarct;
 using Business.Validators.Auth;
 using Business.Validators.Comment;
 using DataAccess.Abstract;
@@ -15,48 +16,54 @@ namespace Business.Concrate
 {
     public class CommentManager : ICommentService
     {
-
-
         private ICommentRepository _commentRepository;
         private IMapper _mapper;
         private readonly CommentCreateDtoValidator _validator;
+        private IUserClaim _userClaim;
 
         public CommentManager(
             ICommentRepository commentRepository,
             IMapper mapper,
-            CommentCreateDtoValidator validator)
+            CommentCreateDtoValidator validator,
+            IUserClaim userClaim
+            )
         {
             _commentRepository = commentRepository;
             _mapper = mapper;
             _validator = validator;
+            _userClaim = userClaim;
         }
 
-        public CommentCreateDto CreateCommet(long userId, long postId, CommentCreateDto commentCreateDto)
+
+        public CommentDto CreateComment(CommentCreateDto commentCreateDto)
         {
             using (var context = new FakeBookDbContext())
             {
-                var entityComment = _mapper.Map<Comment>(commentCreateDto);
-                entityComment.UserId = userId;
-                entityComment.PostId = postId;
-                entityComment.CreatedAt = DateTime.UtcNow;
-
-                var createComment = _commentRepository.Add(context, entityComment);
+                var entity = _mapper.Map<Comment>(commentCreateDto);
+                var created = _commentRepository.Add(context, entity);
                 context.SaveChanges();
 
-                return _mapper.Map<CommentCreateDto>(createComment);
+                return _mapper.Map<CommentDto>(created); // ✅ Uyumlu
             }
         }
 
 
-
-        public void DeleteComment(long id)
+        public void DeleteComment(long commentId)
         {
             using (var context = new FakeBookDbContext())
             {
-                _commentRepository.Delete(context, id);
+                var comment = _commentRepository.GetById(context, commentId);
+                if (comment == null)
+                    throw new Exception("Yorum bulunamadı.");
+
+                if (comment.UserId != _userClaim.UserId && _userClaim.Role != "Admin")
+                    throw new UnauthorizedAccessException("Bu yorumu silme yetkiniz yok.");
+
+                _commentRepository.Delete(context, commentId);
                 context.SaveChanges();
             }
         }
+
 
         public List<CommentDto> GetAllComment()
         {
@@ -68,18 +75,25 @@ namespace Business.Concrate
             }
         }
 
-        public CommentCreateDto UpdateComment(CommentCreateDto commentUpdateDto)
-        {
 
+        public CommentDto UpdateComment(CommentUpdateDto dto)
+        {
             using (var context = new FakeBookDbContext())
             {
-                var entityComment = _mapper.Map<Comment>(commentUpdateDto);
-                var updateComment = _commentRepository.Add(context, entityComment);
+                var existing = _commentRepository.GetById(context, dto.Id);
+                if (existing == null)
+                    throw new Exception("Yorum bulunamadı.");
+
+
+                if (existing.UserId != _userClaim.UserId && _userClaim.Role != "Admin")
+                    throw new UnauthorizedAccessException("Bu yorumu güncelleme yetkiniz yok.");
+
+                existing.Text = dto.Text ?? existing.Text;
                 context.SaveChanges();
 
-                return _mapper.Map<CommentCreateDto>(updateComment);
+                return _mapper.Map<CommentDto>(existing);
             }
-            
         }
     }
 }
+

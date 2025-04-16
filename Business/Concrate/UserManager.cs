@@ -29,7 +29,6 @@ namespace Business.Concrate
                 return _mapper.Map<List<UserDto>>(users);
             }
         }
-
         public UserDto GetByUserId(long id)
         {
             using (var context = new FakeBookDbContext())
@@ -49,10 +48,10 @@ namespace Business.Concrate
                 if (user == null)
                     throw new Exception("Kullanıcı bulunamadı");
 
-                _userRepository.Delete(context, id); // ✅ Sadece id ile sil
+                _userRepository.Delete(context, id); //  Sadece id ile sil
                 context.SaveChanges();
 
-                return _mapper.Map<UserDto>(user); // ✅ Silinen bilgiyi döndür
+                return _mapper.Map<UserDto>(user); //  Silinen bilgiyi döndür
             }
         }
 
@@ -65,17 +64,15 @@ namespace Business.Concrate
                 if (user == null)
                     throw new Exception("Kullanıcı bulunamadı");
 
-                // Güncellenebilir alanlar
-                user.FirstName = userUpdate.FirstName ?? user.FirstName;
-                user.LastName = userUpdate.LastName ?? user.LastName;
-                user.Bio = userUpdate.Bio ?? user.Bio;
-                user.ProfilePicture = userUpdate.ProfilePicture ?? user.ProfilePicture;
+                //güncelleme
+                _mapper.Map(userUpdate, user);
 
                 _userRepository.Update(context, user);
                 context.SaveChanges();
 
                 return _mapper.Map<UserDto>(user);
             }
+
         }
     }
 

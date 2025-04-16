@@ -61,7 +61,6 @@ namespace Business.Concrate
         {
             using (var context = new FakeBookDbContext())
             {
-                
 
                 // DTO -> Entity
                 var user = _mapper.Map<User>(userRegisterDto);
@@ -78,13 +77,9 @@ namespace Business.Concrate
                 // Token oluştur
                 var token = _tokenService.GenerateToken(user);
 
-                return new AuthResponseDto
-                {
-                    Token = token,
-                    FullName = $"{user.FirstName} {user.LastName}",
-                    UserId = user.Id,
-                    Role = user.userRole
-                };
+                var response = _mapper.Map<AuthResponseDto>(user);
+                response.Token = token;
+                return response;
             }
         }
 
@@ -93,30 +88,29 @@ namespace Business.Concrate
         {
             using (var context = new FakeBookDbContext())
             {
+                // 1. Kullanıcıyı bul
                 var user = _userRepository
                     .GetAll(context)
-                    .FirstOrDefault(x => x.Email == userLoginDto.Email);
+                    .FirstOrDefault(x => x.Email.ToLower() == userLoginDto.Email.ToLower());
 
                 if (user == null)
-            throw new Exception("Kullanıcı bulunamadı.");
+                    throw new Exception("Kullanıcı bulunamadı.");
 
-        // 2. Şifre doğrulama
-        var isPasswordValid = _passwordHasher.VerifyPassword(userLoginDto.Password, user.Password);
-        if (!isPasswordValid)
-            throw new Exception("Geçersiz şifre.");
+                // 2. Şifre doğrulama
+                var isPasswordValid = _passwordHasher.VerifyPassword(userLoginDto.Password, user.Password);
+                if (!isPasswordValid)
+                    throw new Exception("Geçersiz şifre.");
 
-        // 3. Token oluştur
-        var token = _tokenService.GenerateToken(user);
+                // 3. Token oluştur
+                var token = _tokenService.GenerateToken(user);
 
-        // 4. DTO oluştur ve dön
-        return new AuthResponseDto
-        {
-            Token = token,
-            FullName = $"{user.FirstName} {user.LastName}",
-            UserId = user.Id,
-            Role = user.userRole
-        };
+                // 4. Map ile AuthResponseDto oluştur
+                var response = _mapper.Map<AuthResponseDto>(user);
+                response.Token = token;
+
+                return response;
             }
         }
+
     }
 }
