@@ -12,7 +12,8 @@ namespace Business.Abstract
         UserDto GetByUserId(long id);
         List<UserDto> GetAllUser();
         UserDto UserUpdate(long id, UserUpdateDto userUpdate);
-
         UserDto UserDelete(long id);
+        //asdsad
+        
     }
 }
